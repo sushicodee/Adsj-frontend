@@ -1,33 +1,30 @@
-import React , {useState} from 'react';
-import './App.css';
-import Routes from './routes/Routes';
+import React, { useState } from "react";
+import { Provider } from "react-redux";
+import "./App.scss";
+import Header from "./components/header/Header";
+import { store } from "./redux/store/store";
+import Routes from "./routes/Routes";
+import { BrowserRouter as Router } from "react-router-dom";
+import Footer from "./components/footer/Footer";
 
-interface IProps {
- name:string; 
-}
+interface IProps {}
 
-interface FormProps<T> {
-  values:T;
-  children: (values:T) => JSX.Element;
-}
-
-const Form =<T extends {}>({values,children}:FormProps<T>) => {
-  return children(values);
-}
-const App:React.FC<IProps> = ({name}) => {
-
+const App: React.FC<IProps> = () => {
   return (
     <div className="App">
-      <Form values = {{lastName:'Shrestha' ,firstName:'sush'}}>
-        {(values) => (
-          <div>
-            {values.lastName};
+      <Router>
+        <Provider store={store}>
+          <div className = 'header-wrapper'>
+          <Header />
           </div>
-        )}
-      </Form>
-      <Routes/>
+          <Routes />
+          <div className = 'footer-wrapper'>
+            <Footer/>
+          </div>
+        </Provider>
+      </Router>
     </div>
   );
-}
+};
 
 export default App;

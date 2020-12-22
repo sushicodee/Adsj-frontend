@@ -1,0 +1,50 @@
+@import './../../styles/variables';
+
+.sidebar-wrapper{
+    ul{
+        background-color: inherit;
+    }
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    .menu-button{
+    }
+}
+a{
+    color:$primary-color;
+    padding: 12px 16px;
+}
+.header-link{
+    padding: 0 16px;
+
+}
+
+.search-container{
+}
+
+.logo{
+    display: flex;
+}
+
+.options-tray{
+    display:flex;
+   button{
+        margin-left:5px;
+        // background-color: $grey;
+        min-width:40px;
+        min-height: 40px;
+        border-radius: $border-circle;
+        &:hover{
+            background-color: $grey;
+            filter:brightness(1.2);
+        }
+        .MuiButton-label{
+            width:30px;
+        }
+        
+    }
+}
+
+
