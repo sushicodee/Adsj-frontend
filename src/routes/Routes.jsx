@@ -1,19 +1,32 @@
 import React from "react";
 import RouteWithsubRoutesHoc from "./RouteWithSubRoutesHoc";
-import { BrowserRouter as Router, NavLink } from "react-router-dom";
-import HomeComponent from "../components/pages/HomeComponent";
 import LoginComponent from "../components/auth/LoginComponent";
-import AuthComponent from "../components/auth/AuthComponent";
-import LogoutComponent from "../components/auth/LogoutComponent";
-import { AuthProvider } from "../context/authContext";
-import Contact from "../components/pages/contact/Contact";
 import SignupComponent from "../components/auth/SignupComponent";
+import Activation from "../components/auth/Activation";
+import PasswordReset from "components/auth/PasswordReset";
+import ForgotPassword from "components/auth/ForgotPassword";
+import Blogs from "components/pages/blogs/Blogs";
+import Admin from "components/pages/admin/Admin";
+import SingleBlog from "components/pages/blogs/SingleBlog";
+import Portfolio from "components/pages/portfolio/Portfolio";
+
 function Routes() {
   const routes = [
     {
       path: "/",
       exact: true,
-      component: HomeComponent,
+      component: Portfolio,
+    },
+    {
+      path: "/admin",
+      exact: true,
+      component: Admin,
+      admin:true
+    },
+    {
+      path: "/portfolio",
+      exact: true,
+      component: Portfolio,
     },
     {
       path: "/login",
@@ -22,33 +35,39 @@ function Routes() {
     {
       path: "/signup",
       component: SignupComponent,
+      exact: true,
     },
     {
-      path: "/contact",
-      component: Contact,
+      path: "/blogs",
+      component: Blogs,
+      exact: true,
     },
-   
+    {
+      path: "/blogs/:id",
+      component: SingleBlog,
+      exact: true,
+    },
+    {
+      path: "/users/activate/:token",
+      component: Activation,
+      exact: true,
+    },
+    {
+      path: "/users/resetPassword",
+      component: PasswordReset,
+      exact: true,
+    },
+    {
+      path: "/users/forgotPassword/:token",
+      component: ForgotPassword,
+      exact: true,
+    },
   ];
   return (
     <>
-      {/* <ul>
-        {routes.map((route) => (
-          <li key={route.path}>
-            <NavLink
-              className="nav-link nav-main"
-              to={route.path}
-              activeClassName="active"
-            >
-              {route.path === "/" ? "Home" : route.path.substr(1)}
-            </NavLink>
-          </li>
-        ))}
-      </ul> */}
       {routes.map((route) => (
-      <AuthProvider>
-        <RouteWithsubRoutesHoc {...route} key={route.path} />
-      </AuthProvider>
-      ))}
+        <RouteWithsubRoutesHoc key={route.path} {...route} allRoutes = {Object.values(routes).map(val => val.path)}  />
+        ))}
     </>
   );
 }

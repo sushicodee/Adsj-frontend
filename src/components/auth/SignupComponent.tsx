@@ -20,6 +20,8 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 interface IProps {
   history: any;
+  match: any;
+  location: any;
 }
 
 interface IDataState {
@@ -29,9 +31,6 @@ interface IDataState {
   confirmPassword: string;
 }
 
-interface IState {
-  data: IDataState;
-}
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     paper: {
@@ -57,9 +56,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SignupComponent: React.FC<IProps> = (props) => {
   const classes = useStyles();
+  const { history } = props;
+
   const initialState = {
     username: '',
-    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -67,34 +67,37 @@ const SignupComponent: React.FC<IProps> = (props) => {
 
   const signupSchema = Yup.object().shape({
     username: Yup.string()
-      .matches(/(?=.*[A-Z])/, 'At least one Uppercase is Required')
-      .matches(/(?=.*[!@#$%^&*])/, 'At least one Special is Required')
+      .lowercase()
       .min(3, 'username too Short')
       .required('Please Enter a username'),
     email: Yup.string()
       .lowercase()
       .required('Please Enter an Email')
       .email('Please Enter a Valid Email'),
-    password: Yup.string().required('Please Enter a Password'),
+    password: Yup.string()
+      .required('Please Enter a Password')
+      .matches(/(?=.*[A-Z])/, 'At least one Uppercase is Required')
+      .matches(/(?=.*[!@#$%^&*])/, 'At least one Special is Required'),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password'), 'Passwords do not match'])
       .required('Please Retype your Password'),
   });
   const handleSubmit = (data: IDataState) => {
-    const { history } = props;
     axiosApi
-      .post('/auth/register', data, {}, true)
+      .post('/auth/signup', data, {}, true)
       .then((data: any) => {
-        Snackbar.showSuccess(data.username + 'User Registered Successfully');
+        console.log(data);
+        Snackbar.showSuccess(data.message);
         setTimeout(() => {
           history.push(`/login`);
         }, 1000);
       })
       .catch((err) => {
-        Snackbar.handleError(err);
+        Snackbar.handleError(err.data);
       })
       .finally(() => {});
   };
+
   return (
     <Container component='main' maxWidth='xs' className='container'>
       <CssBaseline />
@@ -103,7 +106,7 @@ const SignupComponent: React.FC<IProps> = (props) => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component='h1' variant='h5'>
-          Sign up
+          Sign up for ADSJ
         </Typography>
         <Formik
           initialValues={initialState}
