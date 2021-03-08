@@ -152,7 +152,7 @@ const Header: React.FC<IProps> = (props) => {
           onOpen={() => settoggle(true)}
         >
           <div className='sidebar-container wrapper'>
-            {headerLinks.map(({ name, path, icon }, index) =>
+            {headerLinks.map(({ name, path, icon: Icon }, index) =>
               name === 'divider' ? (
                 <Divider key={name + index} />
               ) : (
@@ -166,7 +166,7 @@ const Header: React.FC<IProps> = (props) => {
                     onClick={() => settoggle(false)}
                   >
                     <ListItem>
-                      <icon />
+                      <Icon />
                       <ListItemText primary={name} />
                     </ListItem>
                   </NavLink>

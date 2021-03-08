@@ -86,7 +86,6 @@ const SignupComponent: React.FC<IProps> = (props) => {
     axiosApi
       .post('/auth/signup', data, {}, true)
       .then((data: any) => {
-        console.log(data);
         Snackbar.showSuccess(data.message);
         setTimeout(() => {
           history.push(`/login`);

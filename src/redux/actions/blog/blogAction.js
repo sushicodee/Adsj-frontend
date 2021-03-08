@@ -14,6 +14,9 @@ import {
   SET_PROGRESS_BLOGS,
   SET_CURRENT_PAGE,
   SET_PER_PAGE,
+  SHOW_LOADER,
+  HIDE_LOADER,
+  SET_UPLOAD_PROGRESS,
 } from './types';
 
 export const setProgress = (val) => (dispatch) => {
@@ -73,7 +76,7 @@ export const fetchMainFeaturedBlog = () => async (dispatch) => {
   }
 };
 
-export const addBlog = (data, image = null) => async (dispatch) => {
+export const addBlog = (data, image = null, cb) => async (dispatch) => {
   try {
     if (!image) {
       const { blog } = await axiosApi.post('/blog/admin', data, {}, true);
@@ -82,16 +85,16 @@ export const addBlog = (data, image = null) => async (dispatch) => {
         payload: blog.length && blog[0],
       });
     } else {
-      const { blog } = await axiosApi.postFile(
+      const { blog } = await axiosApi.uploadFile(
         '/blog/admin',
         data,
         image,
-        {},
+        cb,
         true
       );
       dispatch({
         type: ADD_BLOG,
-        payload: blog.length && blog[0],
+        payload: blog,
       });
     }
   } catch (err) {
@@ -99,9 +102,14 @@ export const addBlog = (data, image = null) => async (dispatch) => {
   }
 };
 
-export const updateBlog = (id, data) => async (dispatch) => {
+export const updateBlog = (data) => async (dispatch) => {
   try {
-    const { blog } = await axiosApi.put('/blog/admin', data, { id }, true);
+    const { blog } = await axiosApi.put(
+      '/blog/admin',
+      data,
+      { id: data.id },
+      true
+    );
     dispatch({
       type: UPDATE_BLOG,
       payload: blog.length && blog[0],
@@ -113,12 +121,24 @@ export const updateBlog = (id, data) => async (dispatch) => {
 
 export const deleteBLog = (blog) => async (dispatch) => {
   try {
-    const { data } = await axiosApi.remove('/blog/admin', {
-      Bucket: 'blog-images-1',
-      key: blog.image,
-      id: blog.id,
-    });
-    dispatch({ type: DELETE_BLOG, payload: data });
+    let key;
+    if (blog.image) {
+      const match = 'aws.com/';
+      const indx = blog.image.lastIndexOf(match);
+      key = blog.image.slice(indx + match.length);
+    }
+    const { data } = await axiosApi.remove(
+      '/blog/admin',
+      {
+        params: {
+          Bucket: 'blog-images-1',
+          key,
+          id: blog.id,
+        },
+      },
+      true
+    );
+    dispatch({ type: DELETE_BLOG, payload: blog.id });
   } catch (err) {
     console.log(err);
   }
@@ -136,5 +156,24 @@ export const setPerPage = (val) => (dispatch) => {
   dispatch({
     type: SET_PER_PAGE,
     payload: val,
+  });
+};
+
+export const showLoader = () => (dispatch) => {
+  dispatch({
+    type: SHOW_LOADER,
+  });
+};
+
+export const hideLoader = () => (dispatch) => {
+  dispatch({
+    type: HIDE_LOADER,
+  });
+};
+
+export const setUploadProgress = (value) => (dispatch) => {
+  dispatch({
+    type: SET_UPLOAD_PROGRESS,
+    payload: value,
   });
 };

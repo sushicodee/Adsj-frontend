@@ -13,8 +13,12 @@ import { ThemeProvider } from '@material-ui/styles';
 import Footer from 'components/footer/Footer';
 import { CssBaseline } from '@material-ui/core';
 import { AuthProvider } from 'context/authContext';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import { getLocalStorage } from 'helpers/auth';
 const theme = createMuiTheme({
   palette: {
+    type: getLocalStorage('theme') === 'dark' ? 'dark' : 'light',
     primary: {
       light: '#ff8e8c',
       main: '#ff5a5f',
@@ -39,30 +43,32 @@ interface IProps {}
 
 const App: React.FC<IProps> = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <div className='App'>
-        <Router>
-          <Provider store={store}>
-            <AuthProvider>
-              <CssBaseline />
-              <div className='header-wrapper'>
-                <Header />
-              </div>
-              <div className='body-wrapper'>
-                <Routes />
-              </div>
-              <div className='footer-wrapper'>
-                <Footer />
-              </div>
-              <ToastContainer
-                containerId='toast-container-4646'
-                draggable={false}
-              />
-            </AuthProvider>
-          </Provider>
-        </Router>
-      </div>
-    </ThemeProvider>
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <ThemeProvider theme={theme}>
+        <div className='App'>
+          <Router>
+            <Provider store={store}>
+              <AuthProvider>
+                <CssBaseline />
+                <div className='header-wrapper'>
+                  <Header />
+                </div>
+                <div className='body-wrapper'>
+                  <Routes />
+                </div>
+                <div className='footer-wrapper'>
+                  <Footer />
+                </div>
+                <ToastContainer
+                  containerId='toast-container-4646'
+                  draggable={false}
+                />
+              </AuthProvider>
+            </Provider>
+          </Router>
+        </div>
+      </ThemeProvider>
+    </MuiPickersUtilsProvider>
   );
 };
 

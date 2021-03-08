@@ -2,6 +2,9 @@ import { getItem, setItem } from './../../utils/localStorage/LocalStorage';
 import { SET_PROGRESS, TOGGLE_THEME } from '../actions/app/types';
 
 const theme = getItem('theme') || 'dark';
+if (!getItem('theme')) {
+  setItem('theme', theme);
+}
 document.body.classList.add(theme);
 const initialState = {
   theme: theme,

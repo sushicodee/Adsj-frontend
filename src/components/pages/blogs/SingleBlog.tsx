@@ -3,6 +3,7 @@ import { IBlog } from 'interfaces/blog';
 import { AuthContext } from 'context/authContext';
 import { Container, Grid, makeStyles, Typography } from '@material-ui/core';
 import moment from 'moment';
+import BlogOptions from './components/BlogOptions';
 interface IProps {
   blog: IBlog;
 }
@@ -25,6 +26,7 @@ const SingleBlog: React.FC<IProps> = (props) => {
   const { title, image, description, createdAt } = props?.blog;
   return (
     <Container className={`${classes.root} card`}>
+      {user.role === 'admin' && <BlogOptions blog={props.blog} />}
       <Grid item>
         {image ? (
           <Grid className={classes.imageContainer}>

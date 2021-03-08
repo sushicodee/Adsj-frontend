@@ -80,7 +80,7 @@ const get = (url :string, { params = {} } = {}, isSecure = false) => {
   });
 };
 
-const post = (url :string, data = {}, { params = {} } = {}, isSecure:boolean = false, isFile:boolean = false) => {
+const post = (url :string, data = {}, { params = {} ,config = {}} = {}, isSecure:boolean = false, isFile:boolean = false) => {
   return new Promise((resolve, reject) => {
     http
       .post(url, data, { headers: httpHeaders(isSecure,isFile), params })
@@ -96,6 +96,12 @@ const post = (url :string, data = {}, { params = {} } = {}, isSecure:boolean = f
 
 const postFile = (url :string, data = {}, files : any[] ,{ params = {} } = {}, isSecure:boolean) => {
   return new Promise((resolve, reject) => {
+    const config = {
+      onUploadProgress: function(progressEvent:any) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        console.log(percentCompleted)
+      }
+    }
     const formData = new FormData();
     if (files && files.length) {
       formData.append('image', files[0], files[0].name);
@@ -156,8 +162,17 @@ const remove = (url :string, {params ={}} = {} ,isSecure:boolean) => {
   });
 };
 
-const uploadFile = (method :string, url :string, data : any, files : any[]) => {
+const uploadFile = (url :string, data : any, files : any[],cb:any) => {
   return new Promise((resolve, reject) => {
+    const config = {
+      onUploadProgress: function(progressEvent:any) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        console.log(percentCompleted)
+        if(cb){
+          cb(percentCompleted);
+        }
+      }
+    }
     const formData = new FormData();
     if (files && files.length) {
       formData.append('image', files[0], files[0].name);
@@ -169,8 +184,8 @@ const uploadFile = (method :string, url :string, data : any, files : any[]) => {
       }
       formData.append(key, data[key]);
     }
-    axiosApi.post('/blog/admin')
-      .then((response) => {
+    axiosApi.post(url,formData,{config})
+      .then((response:any) => {
         resolve(response.data);
       })
       .catch((err) => {

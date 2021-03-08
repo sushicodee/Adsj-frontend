@@ -83,7 +83,6 @@ const Blogs: React.FC<IProps> = (props) => {
     blogsCount,
     isBlogsProgress,
     isFeaturedprogress,
-    cachedPages,
   } = blog;
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -97,11 +96,9 @@ const Blogs: React.FC<IProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(cachedPages.includes(currentPage));
-    if (!cachedPages.includes(currentPage)) {
-      console.log('fetching blogs');
-      dispatch(fetchBlogs(currentPage, perPage));
-    }
+    // if (!cachedPages.includes(currentPage)) {
+    // dispatch(fetchBlogs(currentPage, perPage));
+    // }
   }, [currentPage, perPage]);
 
   const handlePageChange = (
@@ -116,7 +113,9 @@ const Blogs: React.FC<IProps> = (props) => {
       <Container maxWidth='lg'>
         <main>
           <MainFeaturedPost post={mainFeaturedBlog} />
-          {user && user.role === 'admin' && <BlogFormCard />}
+          {user && user.role === 'admin' && (
+            <BlogFormCard title='CREATE POST' />
+          )}
           <Grid container spacing={4}>
             {!isFeaturedprogress ? (
               featuredBlogs.map((post) => (

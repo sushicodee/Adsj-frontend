@@ -39,7 +39,6 @@ export const getLocalStorage = (key, value) => {
 };
 
 export const authenticate = (data, next) => {
-  console.log(data, 'setting token');
   setCookie('token', data.accessToken);
   setCookie('refreshToken', data.refreshToken);
   setLocalStorage('user', data.user);

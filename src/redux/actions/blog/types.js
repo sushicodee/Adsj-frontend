@@ -13,3 +13,6 @@ export const UPDATE_BLOG = 'UPDATE_BLOG';
 // fetching blogs
 export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE';
 export const SET_PER_PAGE = 'SET_PER_PAGE';
+export const SHOW_LOADER = 'SHOW_LOADER';
+export const HIDE_LOADER = 'HIDE_LOADER';
+export const SET_UPLOAD_PROGRESS = 'SET_UPLOAD_PROGRESS';

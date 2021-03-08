@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-// import './FileUploadButton.scss';
 import { Grid, Icon, Typography } from '@material-ui/core';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,7 +24,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const FileUploadButton = ({
+type uploadProps = {
+  name: string;
+  label?: string;
+  value?: string;
+  multiple?: boolean;
+  handlechange: (e: ChangeEvent<unknown>) => void;
+  error?: string;
+};
+
+const FileUploadButton: React.FC<uploadProps> = ({
   name,
   label,
   value,

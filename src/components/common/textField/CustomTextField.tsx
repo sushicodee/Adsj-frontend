@@ -3,6 +3,7 @@ import { TextField } from '@material-ui/core';
 import { FieldAttributes, useField } from 'formik';
 
 type Variant = 'standard' | 'filled' | 'outlined';
+type Color = 'primary' | 'secondary';
 
 type ItextProps = {
   label: string;
@@ -11,6 +12,7 @@ type ItextProps = {
   rows?: number;
   fullWidth?: boolean;
   variant?: Variant;
+  color?: Color;
 } & FieldAttributes<{}>;
 
 const CustomTextField: React.FC<ItextProps> = ({
@@ -29,7 +31,7 @@ const CustomTextField: React.FC<ItextProps> = ({
     <TextField
       className={props.className || 'text-field'}
       autoComplete='off'
-      variant={variant}
+      variant={variant || 'outlined'}
       rows={rows}
       multiline={multiline}
       placeholder={placeholder}

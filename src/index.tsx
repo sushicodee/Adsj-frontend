@@ -5,11 +5,9 @@ import * as serviceWorker from './serviceWorker';
 import { StylesProvider } from '@material-ui/core/styles';
 
 ReactDOM.render(
-  <React.StrictMode>
-     <StylesProvider injectFirst>
+  <StylesProvider injectFirst>
     <App />
-    </StylesProvider>
-  </React.StrictMode>,
+  </StylesProvider>,
   document.getElementById('root')
 );
 

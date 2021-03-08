@@ -10,6 +10,7 @@ import {
   SET_PROGRESS_BLOGS,
   SET_CURRENT_PAGE,
   SET_PER_PAGE,
+  SET_UPLOAD_PROGRESS,
 } from 'redux/actions/blog/types';
 
 import { v4 as uuid } from 'uuid';
@@ -25,6 +26,7 @@ const initialState = {
   isBlogsProgress: false,
   isFeaturedProgress: false,
   cachedPages: [],
+  uploadProgress: 0,
 };
 
 export const blogReducer = (state = initialState, action) => {
@@ -52,36 +54,37 @@ export const blogReducer = (state = initialState, action) => {
         perPage: action.payload,
       };
     case FETCH_BLOGS:
-      const start = (action.payload.currentPage - 1) * action.payload.perPage;
-      const end = start + action.payload.perPage - 1;
-      const updatedBlogs = [...state.blogs];
-      for (let i = 0; i <= Math.max(end, updatedBlogs.length); i++) {
-        if (!state.cachedPages.includes(action.payload.currentPage)) {
-          if (i !== start) {
-            if (updatedBlogs[i] === undefined) {
-              updatedBlogs[i] = { id: uuid() };
-            }
-          } else {
-            const isMockData =
-              updatedBlogs[i] && !updatedBlogs[i].hasOwnProperty('title');
-            if (isMockData) {
-              updatedBlogs.splice(
-                start,
-                action.payload.perPage,
-                ...action.payload.blogs
-              );
-            } else {
-              updatedBlogs.splice(start, 0, ...action.payload.blogs);
-            }
-            break;
-          }
-        }
-      }
+      // const start = (action.payload.currentPage - 1) * action.payload.perPage;
+      // const end = start + action.payload.perPage - 1;
+      const updatedBlogs = action.payload.blogs;
+      // const updatedBlogs = [...state.blogs];
+      // for (let i = 0; i <= Math.max(end, updatedBlogs.length); i++) {
+      //   if (!state.cachedPages.includes(action.payload.currentPage)) {
+      //     if (i !== start) {
+      //       if (updatedBlogs[i] === undefined) {
+      //         updatedBlogs[i] = { id: uuid() };
+      //       }
+      //     } else {
+      //       const isMockData =
+      //         updatedBlogs[i] && !updatedBlogs[i].hasOwnProperty('title');
+      //       if (isMockData) {
+      //         updatedBlogs.splice(
+      //           start,
+      //           action.payload.perPage,
+      //           ...action.payload.blogs
+      //         );
+      //       } else {
+      //         updatedBlogs.splice(start, 0, ...action.payload.blogs);
+      //       }
+      //       break;
+      //     }
+      //   }
+      // }
       return {
         ...state,
         blogs: updatedBlogs,
         blogsCount: action.payload.count,
-        cachedPages: [...state.cachedPages, action.payload.currentPage],
+        // cachedPages: [...state.cachedPages, action.payload.currentPage],
       };
     case FETCH_FEATURED_BLOGS:
       return {
@@ -98,14 +101,16 @@ export const blogReducer = (state = initialState, action) => {
       return {
         ...state,
         blogs: [action.payload, ...state.blogs],
+        blogsCount: state.blogsCount + 1,
       };
     }
 
     case DELETE_BLOG: {
-      const updatedblogs = state.blogs.filter((p) => p.__id !== action.payload);
+      const updatedblogs = state.blogs.filter((p) => p.id !== action.payload);
       return {
         ...state,
         blogs: updatedblogs,
+        blogsCount: state.blogsCount - 1,
       };
     }
     case UPDATE_BLOG: {
@@ -118,6 +123,13 @@ export const blogReducer = (state = initialState, action) => {
       return {
         ...state,
         blogs: updatedBlog,
+      };
+    }
+
+    case SET_UPLOAD_PROGRESS: {
+      return {
+        ...state,
+        uploadProgress: action.payload,
       };
     }
     default:

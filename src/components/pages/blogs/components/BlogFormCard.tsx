@@ -1,21 +1,28 @@
 import {
   Button,
+  CircularProgress,
   Container,
   createStyles,
   CssBaseline,
+  FormControl,
+  FormLabel,
   Grid,
   Input,
   makeStyles,
+  RadioGroup,
   Typography,
 } from '@material-ui/core';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
-import { addBlog } from 'redux/actions/blog/blogAction';
-import { useForm } from 'utils/hooks/useForm';
+import { addBlog, setUploadProgress } from 'redux/actions/blog/blogAction';
 import CustomTextField from 'components/common/textField/CustomTextField';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useDispatch } from 'react-redux';
 import FileUploadButton from 'components/common/fileUploadButton/FileUploadButton';
+import CustomCheckBox from 'components/common/CustomCheckBox/CustomCheckBox';
+import LinearProgressWithLabel from 'components/common/LinearProgress/LinearProgressWithLabel';
+import { DatePicker } from '@material-ui/pickers';
+import DateFnsHelper from 'utils/datefns/DateHelper';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     paper: {
@@ -32,6 +39,10 @@ const useStyles = makeStyles((theme: Theme) =>
     submit: {
       margin: '8px 0 4px',
     },
+    startDate: {
+      marginRight: theme.spacing(1),
+    },
+    endDate: {},
     submitting: {},
     button: {
       fontFamily: 'Montserrat',
@@ -39,31 +50,58 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface IProps {}
+interface IProps {
+  title: string;
+}
 
-const BlogFormCard: React.FC<IProps> = (props) => {
+const BlogFormCard: React.FC<IProps> = ({ title }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const DATE_FORMAT = 'dd/MM/yyyy';
 
   const blogSchema = Yup.object().shape({
     title: Yup.string().lowercase().required('Please Enter a title'),
     description: Yup.string(),
+    startDate: Yup.date().nullable(),
+    endDate: Yup.date()
+      .nullable()
+      .min(
+        Yup.ref('startDate'),
+        ({ min }) =>
+          `Date needs to be after ${DateFnsHelper.handleFormatDate(
+            min,
+            DATE_FORMAT
+          )}!!`
+      ),
   });
 
   const initialState = {
     title: '',
     description: '',
+    isFeatured: false,
+    isMainFeatured: false,
+    startDate: new Date(),
+    endDate: null,
+  };
+  const [uploadProgress, setuploadProgress] = useState<number>(0);
+
+  const handleUploadProgress = (val) => {
+    setuploadProgress(val);
+    if (val === 100) {
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 500);
+    }
   };
 
   function handleSubmit(data: any) {
-    if (image) {
-      const formData = [...data, image];
+    if (!image) {
+      dispatch(addBlog(data));
+    } else {
+      dispatch(addBlog(data, image, setuploadProgress));
     }
-    // if (image) {
-    // } else {
-    //   dispatch(addBlog(data));
-    // }
   }
+
   const [image, setimage] = useState();
 
   const handleChange = (e) => {
@@ -72,9 +110,9 @@ const BlogFormCard: React.FC<IProps> = (props) => {
       setimage(files);
     }
   };
+
   return (
     <Container component='main' maxWidth='lg' className={`${classes.paper}`}>
-      <CssBaseline />
       <div className={classes.paper}>
         <Formik
           initialValues={initialState}
@@ -85,20 +123,15 @@ const BlogFormCard: React.FC<IProps> = (props) => {
             setSubmitting(false);
           }}
         >
-          {({ isSubmitting, isValid, touched }) => {
+          {({ isSubmitting, isValid, values, setFieldValue, errors }) => {
             const submitButtonClass = isSubmitting
               ? classes.submitting
               : classes.submit;
             return (
               <>
-                <FileUploadButton
-                  name={'image'}
-                  label={'Upload a Photo'}
-                  value={image}
-                  //   error={data._id ? errors['newimage'] : errors[field.key]}
-                  //   props={field.props}
-                  handlechange={handleChange}
-                />
+                <Typography variant='h4' align='center'>
+                  {title}
+                </Typography>
                 <Form className={classes.form} noValidate>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
@@ -124,29 +157,92 @@ const BlogFormCard: React.FC<IProps> = (props) => {
                         placeholder='Enter a description'
                       />
                     </Grid>
+                    <Grid item xs={12}>
+                      <FormControl>
+                        <FormLabel>Featuring </FormLabel>
+                        <RadioGroup row>
+                          <CustomCheckBox
+                            id='isFeatured'
+                            type='checkbox'
+                            label='Featured'
+                            name='isFeatured'
+                          />
+                          <CustomCheckBox
+                            type='checkbox'
+                            id='isMainFeatured'
+                            name='isMainFeatured'
+                            label='MainFeatured'
+                          />
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} className={classes.startDate}>
+                      <Field
+                        component={DatePicker}
+                        label='Start Date'
+                        name='startDate'
+                        format={DATE_FORMAT}
+                        onChange={(date: Date) =>
+                          setFieldValue('startDate', date)
+                        }
+                        value={values.startDate}
+                      />
+                      <Field
+                        component={DatePicker}
+                        label='End Date'
+                        name='endDate'
+                        format={DATE_FORMAT}
+                        onChange={(date: Date) =>
+                          setFieldValue('endDate', date)
+                        }
+                        value={values.startDate}
+                        error={!!errors['endDate']}
+                        helperText={errors['endDate']}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FileUploadButton
+                        name={'image'}
+                        label={'Upload a Photo'}
+                        value={image}
+                        //   error={data._id ? errors['newimage'] : errors[field.key]}
+                        //   props={field.props}
+                        handlechange={handleChange}
+                      />
+                      {uploadProgress !== 0 && (
+                        <LinearProgressWithLabel value={uploadProgress} />
+                      )}
+                    </Grid>
+                    <Grid item xs={12}>
+                      {isSubmitting ? (
+                        <Button
+                          fullWidth
+                          variant='contained'
+                          color='secondary'
+                          className={`${submitButtonClass} ${classes.submit} ${classes.button}`}
+                          disabled={isSubmitting}
+                        >
+                          <CircularProgress
+                            color='secondary'
+                            variant='determinate'
+                          />
+                        </Button>
+                      ) : (
+                        <Button
+                          type='submit'
+                          fullWidth
+                          variant='contained'
+                          color='primary'
+                          className={`${submitButtonClass} ${classes.submit}${classes.button}`}
+                          disabled={!isValid}
+                        >
+                          POST
+                        </Button>
+                      )}
+                    </Grid>
                   </Grid>
-                  {isSubmitting ? (
-                    <Button
-                      fullWidth
-                      variant='contained'
-                      color='secondary'
-                      className={`${submitButtonClass} ${classes.submit} ${classes.button}`}
-                      disabled={isSubmitting}
-                    >
-                      posting...
-                    </Button>
-                  ) : (
-                    <Button
-                      type='submit'
-                      fullWidth
-                      variant='contained'
-                      color='primary'
-                      className={`${submitButtonClass} ${classes.submit}${classes.button}`}
-                      disabled={!isValid || !touched}
-                    >
-                      Post
-                    </Button>
-                  )}
+
+                  <pre>{JSON.stringify(values)}</pre>
                 </Form>
               </>
             );

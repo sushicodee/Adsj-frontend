@@ -22,15 +22,15 @@ interface Iprops {
 export default function MainSection(props: Iprops) {
   const classes = useStyles();
   const { blogs, title, currentPage, perPage } = props;
-  const start = (currentPage - 1) * perPage;
-  const end = start + perPage;
+  // const start = (currentPage - 1) * perPage;
+  // const end = start + perPage;
   return (
     <Grid item>
       <Typography variant='h6' gutterBottom>
         {title}
       </Typography>
       <Divider />
-      {blogs.slice(start, end).map((blog: any) => {
+      {blogs.map((blog: any) => {
         return <SingleBlog key={blog.id + 'blogs'} blog={blog} />;
       })}
     </Grid>
